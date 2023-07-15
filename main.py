@@ -8,6 +8,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="/", intents = intents)
 maxQuestionLength = 17
 questionsParent = "Questions"
+questionsAskID = 1129651287206658070
 
 @bot.event
 async def on_ready():
@@ -15,7 +16,7 @@ async def on_ready():
 
 @bot.command()
 async def ask(ctx, *args):
-    if ctx.channel.id == 1129619068429803570:
+    if ctx.channel.id == questionsAskID:
         if len(' '.join(args)) <= maxQuestionLength:
             category = discord.utils.get(ctx.guild.categories, name=questionsParent)
             if not category:
@@ -37,7 +38,7 @@ async def answered(ctx):
         async for message in ctx.channel.history(limit=1, oldest_first=True):
             first_message = message
             break
-        if first_message.content == ctx.message.author.mention:
+        if first_message.content == ctx.message.author.mention or ctx.message.author.guild_permissions.administrator:
             await ctx.send("Closing channel...")
             await asyncio.sleep(1)
             await ctx.channel.delete()
