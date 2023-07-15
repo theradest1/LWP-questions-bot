@@ -5,7 +5,7 @@ import asyncio
 
 intents = discord.Intents.all()
 intents.message_content = True
-bot = commands.Bot(command_prefix="/", intents = intents)
+bot = commands.Bot(command_prefix=">>", intents = intents)
 maxQuestionLength = 17
 questionsParent = "Questions"
 questionsAskID = 1129651287206658070
@@ -33,8 +33,8 @@ async def ask(ctx, *args):
         
 @bot.command()
 async def answered(ctx):
-    category = discord.utils.get(ctx.guild.categories, name=questionsParent)
-    if ctx.channel.category == category:
+    questionsParentCatagory = discord.utils.get(ctx.guild.categories, name=questionsParent)
+    if ctx.channel.category == questionsParentCatagory and ctx.channel.name != "lwp-questions":
         async for message in ctx.channel.history(limit=1, oldest_first=True):
             first_message = message
             break
@@ -45,7 +45,16 @@ async def answered(ctx):
         else:
             await ctx.send("You do not own this question - ask the creator or an admin to get rid of this channel")
     else:
-        await ctx.send("This is not a question channel, if you have one, send it there.")
+        await ctx.send("This is not a question channel, run `>>info` for more info")
+        
+@bot.command()
+async def info(ctx):
+    embedVar = discord.Embed(title="How to use LWP Questions bot:", description="", color=0x0047AB)
+    embedVar.add_field(name="Directions:", value="Start by running the `>>ask` command with a very quick summary of your question following it. This allows helpers to see what is being asked, and weather or not they have that area of expertise. Ex: `>>ask controller problems`\n\nSomeone will then be able to help you in that channel that has been created to keep questions from overlapping or being forgotten.\n\nAfter your question has been answered, or you just want to get rid of it, run the command `>>answered` inside your channel.\n\nIf you have any questions or problems, ask an admin (:", inline=False)
+    embedVar.add_field(name="Create Question:", value="`>>ask *your question*`\nrun this command in <#" + str(questionsAskID) + ">", inline=False)
+    embedVar.add_field(name="Close Question:", value="`>>answered`\nrun this command in your question channel", inline=False)
+    embedVar.add_field(name="Info:", value="`>>info`\nRun this command anywhere", inline=False)
+    await ctx.send(embed=embedVar)
 
 tokenFile = open("token.txt")
 content = tokenFile.readlines()
